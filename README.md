@@ -13,7 +13,7 @@ the SD card numerous times. Bootloader will write program into RAM at address 0x
 4) restart RPi
 5) boot program:
 ```c
-sudo ./rpiloader /dev/ttyUSB0 prog
+sudo ./rpiloader -s /dev/ttyUSB0 -i example.img
 ```
 For next boot you need to repeat only steps 4 and 5.
 

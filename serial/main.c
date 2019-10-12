@@ -123,20 +123,17 @@ int main(int argc, char **argv){
 			printf(" -h        : print help\n");
 			printf(" -s [path] : set serial path\n");
 			printf(" -i [path] : set executable path\n");
-			break;
+			exit(0);
 		default:
 			printf(" Illegal options.\n");
 			exit(1);
 		}
 	}
 
-	printf("Serial path:\t%s\n", serial_path);
-	printf("Input path:\t%s\n", input_path);
-
-	if(test){
+	if(test)
 		run_test();
-	}else{
-		send_prog();	
-	}
+	else
+		send_prog();
+
 	return 0;
 }
