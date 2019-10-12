@@ -1,19 +1,21 @@
 #include <stdio.h>
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <errno.h>
 #include "serial.h"
 
 
-#define CN	"\x1B[0m"
-#define CR	"\x1B[31m"
-#define CG	"\x1B[32m"
-#define CY	"\x1B[33m"
-#define PACK_LEN	32
-
 #define CMD_TEST	0
 #define CMD_EXE		1
+#define PACK_LEN	32
+
+
+char *input_default="kernel.img";
+char *serial_default="/dev/ttyUSB0";
+char *input_path;
+char *serial_path;
+
 
 
 char* load_file(char *path, int *size){
@@ -23,9 +25,8 @@ char* load_file(char *path, int *size){
 	// open file	
 	f=fopen(path, "rb");
 	if(!f){
-		printf("%sFAIL%s\n", CR, CN);
-		printf("ERROR: file_open: %s.\n", strerror(errno));
-		exit(10);
+		printf("ERROR: file_open: %s.\n %s\n", strerror(errno), path);
+		exit(1);
 	}
 
 	// get file size
@@ -36,94 +37,106 @@ char* load_file(char *path, int *size){
 	// allocate memory
 	data=(char*)malloc(*size);
 	if(!data){
-		printf("%sFAIL%s\n", CR, CN);
 		printf("ERROR: malloc: %s.\n", strerror(errno));
-		exit(11);
+		exit(2);
 	}
 
 	// read file
 	*size=fread(data, 1, *size, f);
 	if(*size<0){
-		printf("%sFAIL%s\n", CR, CN);
-		printf("ERROR: file_read: fread: %s.\n", strerror(errno));
-		exit(12);
+		printf("ERROR: fread: %s.\n %s\n", strerror(errno), path);
+		exit(3);
 	}
 	fclose(f);
 	return data;
 }
 
-
-
 void run_test(){
-	char buf[PACK_LEN];
-
-	printf("Test...\n");
-
-	memset(buf, 0, PACK_LEN);
+	char buf[PACK_LEN]={0};
+	printf("TEST\t");
+	serial_open(serial_path);
 	serial_send(buf, PACK_LEN);
 	serial_recv(buf, PACK_LEN);
-
-	printf("1/1 Ready\t%sOK%s\n", CG, CN);
+	serial_close();
+	printf("OK\n");
 }
 
-void send_prog(char *path){
+void send_prog(){
 	int size;
 	char *data;
 	char msg[PACK_LEN];
 
 	printf("Boot...\n");
+	serial_open(serial_path);
 
 	// load file
-	data=load_file(path, &size);
-	printf("1/5 File read\t%sOK%s\n", CG, CN);
+	data=load_file(input_path, &size);
+	printf("1/5 File read\t\tOK\n");
 
 	// send request
 	printf("2/5 Send request\t");
 	msg[0]=CMD_EXE;
 	sprintf(msg+1, "%d", size);
 	serial_send(msg, PACK_LEN);
-	printf("%sOK%s\n", CG, CN);
+	printf("OK\n");
 
 	// recv response
-	printf("3/5 Recv ack\t");
+	printf("3/5 Recv ack\t\t");
 	serial_recv(msg, PACK_LEN);
-	printf("%sOK%s\n", CG, CN);
+	printf("OK\n");
 
 	// send file
-	printf("4/5 Send file\t");
+	printf("4/5 Send file\t\t");
 	serial_send(data, size);
-	printf("%sOK%s\n", CG, CN);	
+	printf("OK\n");	
 	
 	// recv response
-	printf("5/5 Recv ack\t");
+	printf("5/5 Recv ack\t\t");
 	serial_recv(msg, PACK_LEN);
-	printf("%sOK%s\n", CG, CN);
+	printf("OK\n");
 
-	printf("%sFinish%s\n", CG, CN);
+	serial_close();
+	printf("Finish\n");
 }
 
 
 int main(int argc, char **argv){
-	if(argc==2){
-		// Run test
-		serial_open(argv[1]);
-		run_test();
-		serial_close();
-		return 0;
+	int c, test=0;
 
-	}else if(argc==3){
-		// Execute program
-		serial_open(argv[1]);
-		send_prog(argv[2]);
-		serial_close();
-		return 0;
+	input_path=input_default;
+	serial_path=serial_default;
 
-	}else{
-		// Print help
-		printf("%sWARNING: Illegal arguments.%s\n", CY, CN);
-		printf("Usage:\n");
-		printf("For boot: rpiloader [serial] [file]\n");
-		printf("For test: rpiloader [serial]\n");
-		return 1;
+	while((c=getopt(argc, argv, "s:i:th"))!=-1){
+		switch(c){
+		case 's':
+			serial_path=optarg;
+			break;
+		case 'i':
+			input_path=optarg;
+			break;
+		case 't':
+			test=1;
+			break;
+		case 'h':
+			printf("Usage:\n");
+			printf(" -t        : run test\n");
+			printf(" -h        : print help\n");
+			printf(" -s [path] : set serial path\n");
+			printf(" -i [path] : set executable path\n");
+			break;
+		default:
+			printf(" Illegal options.\n");
+			exit(1);
+		}
 	}
+
+	printf("Serial path:\t%s\n", serial_path);
+	printf("Input path:\t%s\n", input_path);
+
+	if(test){
+		run_test();
+	}else{
+		send_prog();	
+	}
+	return 0;
 }

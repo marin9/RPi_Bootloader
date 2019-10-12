@@ -11,12 +11,12 @@ void delay(int n){
 }
 
 void main(){
-	gpio_mode(LEDPIN, OUTPUT);
+	gpio_open(LEDPIN, OUTPUT);
 
 	while(1){
-		gpio_set(LEDPIN, HIGH);
+		gpio_write(LEDPIN, LOW);
 		delay(DELAY);
-		gpio_set(LEDPIN, LOW);
+		gpio_write(LEDPIN, HIGH);
 		delay(DELAY);
 	}
 }

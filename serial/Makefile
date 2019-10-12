@@ -1,15 +1,19 @@
 CC=gcc
 CFLAGS=-Wall -Wextra
-
-SRC=main.c serial.c
+LDFLAGS=
 TARGET=rpiloader
 
+SRC=$(wildcard *.c)
+INC=$(wildcard *.h)
+OBJ=$(SRC:.c=.o)
 
-all: $(TARGET)
+$(TARGET): $(OBJ)
+	$(CC) $(OBJ) -o $@ $(LDFLAGS)
 
-$(TARGET): $(SRC)
-	$(CC) $(CFLAGS) $(SRC) -o $(TARGET)
+%.o : %.c $(INC)
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:
 	rm -f $(TARGET)
+	rm -f *.o
 

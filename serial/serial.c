@@ -16,8 +16,8 @@ void serial_open(char *path){
 	// O_NDELAY - Non Blocking Mode,Does not care about the
 	// status of DCD line, open() returns immediatly
 	if((serial=open(path, O_RDWR|O_NOCTTY|O_NDELAY))<0){
-		printf("ERROR: serial_open: %s\n", strerror(errno));
-		exit(1);
+		printf("ERROR: serial open fail: %s\n%s\n", strerror(errno), path);
+		exit(10);
 	}
 
 	// Set the attributes to the termios structure
@@ -29,8 +29,8 @@ void serial_open(char *path){
 	tcflush(serial, TCIFLUSH);
 	
 	if((tcsetattr(serial, TCSANOW, &st))!=0){
-		printf("ERROR: tcsetattr: %s\n", strerror(errno));
-		exit(2);
+		printf("ERROR: serial open fail: tcsetattr: %s\n", strerror(errno));
+		exit(11);
 	}
 }
 
@@ -43,8 +43,8 @@ void serial_send(char *buff, int len){
 	while(i<len){
 		r=write(serial, buff+i, len-i);
 		if(r<0 && errno!=11){
-			printf("ERROR: serial_write: %d %s\n", errno, strerror(errno));
-			exit(3);
+			printf("ERROR: serial write fail: %s\n", strerror(errno));
+			exit(12);
 		}else if(r<0 && errno==11){
 			continue;
 		}
@@ -58,8 +58,8 @@ void serial_recv(char *buff, int len){
 	while(i<len){
 		r=read(serial, buff+i, len-i);
 		if(r<0){
-			printf("ERROR: serial_read: %s\n", strerror(errno));
-			exit(4);
+			printf("ERROR: serial read fail: %s\n", strerror(errno));
+			exit(13);
 		}
 		i+=r;
 	}
