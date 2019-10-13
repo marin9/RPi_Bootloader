@@ -10,8 +10,11 @@ SECTIONS{
 		*(.text*);
 	}
 
-	.data : {
+	.rodate : {
 		*(.rodata*);
+	}
+
+	.data : {
 		*(.data*);
 	}
 

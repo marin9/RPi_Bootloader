@@ -1,6 +1,5 @@
 CC=gcc
 CFLAGS=-Wall -Wextra
-LDFLAGS=
 TARGET=rpiloader
 
 SRC=$(wildcard *.c)
@@ -8,12 +7,13 @@ INC=$(wildcard *.h)
 OBJ=$(SRC:.c=.o)
 
 $(TARGET): $(OBJ)
-	$(CC) $(OBJ) -o $@ $(LDFLAGS)
+	@echo " Create\t\t" $@
+	@$(CC) $(OBJ) -o $@ $(LDFLAGS)
 
 %.o : %.c $(INC)
-	$(CC) $(CFLAGS) -c -o $@ $<
+	@echo " Compile\t" $@
+	@$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:
-	rm -f $(TARGET)
-	rm -f *.o
-
+	@echo " Clean"
+	@-rm -f $(TARGET) *.o

@@ -1,25 +1,29 @@
 CC=arm-none-eabi
-CFLAGS=-mcpu=arm1176jzf-s -ffreestanding -nostdlib -Wall -Wextra -c
+MCPU=-mcpu=arm1176jzf-s
+CFLAGS=-ffreestanding -nostdlib -Wall -Wextra -c
 LDFLAGS=-nostdlib -lgcc
 
-
-ELF=kernel.elf
 TARGET=kernel.img
+ELF=kernel.elf
+LINKER=linker.ld
 
 
-all: $(TARGET)
+$(TARGET): start.S main.c string.c string.h gpio.c gpio.h uart.c uart.h
+	@echo " Compile\tstart.o"
+	@$(CC)-gcc $(MCPU) $(CFLAGS) start.S -o start.o
+	@echo " Compile\tmain.o"
+	@$(CC)-gcc $(MCPU) $(CFLAGS) main.c -o main.o
+	@echo " Compile\tuart.o"
+	@$(CC)-gcc $(MCPU) $(CFLAGS) uart.c -o uart.o
+	@echo " Compile\tgpio.o"
+	@$(CC)-gcc $(MCPU) $(CFLAGS) gpio.c -o gpio.o
+	@echo " Compile\tstring.o"
+	@$(CC)-gcc $(MCPU) $(CFLAGS) string.c -o string.o
+	@echo " Compile\t$(ELF)"
+	@$(CC)-gcc -T $(LINKER) start.o main.o uart.o gpio.o string.o -o $(ELF) $(LDFLAGS)
+	@echo " Create\t\t$(TARGET)"
+	@$(CC)-objcopy $(ELF) -O binary $(TARGET)
 
 clean:
-	rm -f *.o
-	rm -f $(ELF)
-	rm -f $(TARGET)
-
-$(TARGET): start.s main.c string.c string.h gpio.c gpio.h uart.c uart.h
-	$(CC)-gcc $(CFLAGS) string.c -o string.o
-	$(CC)-gcc $(CFLAGS) start.s -o start.o
-	$(CC)-gcc $(CFLAGS) main.c -o main.o
-	$(CC)-gcc $(CFLAGS) uart.c -o uart.o
-	$(CC)-gcc $(CFLAGS) gpio.c -o gpio.o
-	$(CC)-gcc -T linker.ld start.o main.o uart.o gpio.o string.o -o $(ELF) $(LDFLAGS)
-	$(CC)-objcopy $(ELF) -O binary $(TARGET)
-
+	@echo " Clean"
+	@rm -f $(TARGET) $(ELF) *.o

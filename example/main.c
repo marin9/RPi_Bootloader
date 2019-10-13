@@ -1,7 +1,7 @@
 #include "gpio.h"
 
 #define LEDPIN	47
-#define DELAY	5000000
+#define DELAY	2000000
 
 
 void delay(int n){
@@ -20,4 +20,3 @@ void main(){
 		delay(DELAY);
 	}
 }
-
