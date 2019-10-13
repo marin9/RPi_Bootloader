@@ -10,6 +10,9 @@
 #define CMD_EXE		1
 #define PACK_LEN	32
 
+char *serial_default="/dev/ttyUSB0";
+char *exe_default="kernel.img";
+
 
 void run_test(char *serial_path){
 	char buf[PACK_LEN];
@@ -74,8 +77,8 @@ void boot_prog(char *serial_path, char *exe_path){
 int main(int argc, char **argv){
 	int c;
 	int test=0;
-	char *exe_path=0;
-	char *serial_path=0;
+	char *exe_path=exe_default;
+	char *serial_path=serial_default;
 
 	while((c=getopt(argc, argv, "s:i:th"))!=-1){
 		switch(c){
