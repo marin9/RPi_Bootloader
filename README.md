@@ -13,7 +13,7 @@ make
 4) restart RPi
 5) boot program:
 ```c
-sudo ./rpiloader -s /dev/ttyUSB0 -i example.img
+sudo ./rpiloader -s /dev/ttyUSB0 -i example/kernel.img
 ```
 For next boot you need to repeat only steps 4 and 5.
 
