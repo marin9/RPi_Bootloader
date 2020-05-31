@@ -1,11 +1,11 @@
-CC	= arm-none-eabi
-MCPU	= -mcpu=arm1176jzf-s
-CFLAGS	= -nostdlib -ffreestanding -Wall -Wextra -O2
-LDFLAGS	= -nostdlib -lgcc
+CC=arm-none-eabi
+MCPU=-mcpu=arm1176jzf-s
+CFLAGS=-nostdlib -ffreestanding -Wall -Wextra -O2
+LDFLAGS=-nostdlib -lgcc
 
-LINKER	= linker.ld
-ELF	= kernel.elf
-TARGET	= kernel.img
+LINKER=linker.ld
+ELF=kernel.elf
+TARGET=../blink.img
 
 INC	:= $(wildcard *.h)
 SRC := $(wildcard *.c)

@@ -1,6 +1,6 @@
-CC		= gcc
-CFLAGS	= -Wall -Wextra
-TARGET	= rpiprog
+CC=gcc
+CFLAGS=-Wall -Wextra
+TARGET=../rpiprog
 
 SRC=$(wildcard *.c)
 INC=$(wildcard *.h)
