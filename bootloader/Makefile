@@ -8,28 +8,18 @@ ELF=kernel.elf
 TARGET=../kernel.img
 
 INC	:= $(wildcard *.h)
-ASM	:= start.S
-SRC	:= main.c
-SRC	+= gpio.c
-SRC	+= uart.c
-
-
-OBJA	:= $(ASM:%.S=%.o)
-OBJC	:= $(SRC:%.c=%.o)
+SRC	:= $(wildcard *.c)
+OBJ	:= $(SRC:%.c=%.o)
 
 $(TARGET): $(ELF)
 	@echo " Create\t\t" $(TARGET)
 	@$(CC)-objcopy $(ELF) -O binary $(TARGET)
 
-$(ELF): $(LINKER) $(OBJA) $(OBJC)
+$(ELF): $(LINKER) $(OBJ)
 	@echo " Linking\t" $(ELF)
-	@$(CC)-gcc -T $(LINKER) $(OBJA) $(OBJC) -o $@ $(LDFLAGS)
+	@$(CC)-gcc -T $(LINKER) $(OBJ) -o $@ $(LDFLAGS)
 
-$(OBJA): %.o : %.S $(INC)
-	@echo " Compile\t" $<
-	@$(CC)-gcc $(MCPU) $(CFLAGS) -c $< -o $@
-
-$(OBJC): %.o : %.c $(INC)
+$(OBJ): %.o : %.c $(INC)
 	@echo " Compile\t" $<
 	@$(CC)-gcc $(MCPU) $(CFLAGS) -c $< -o $@
 

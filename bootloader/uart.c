@@ -9,7 +9,7 @@
 #define UART_ICR	((volatile uint*)(UART_BASE + 0x44))
 
 #define CR_EN		(1 << 0)
-#define CR_RXEN		(1 << 7)
+#define CR_RXEN		(1 << 9)
 #define CR_TXEN		(1 << 8)
 #define FR_RXFE		(1 << 4)
 #define FR_TXFF		(1 << 5)
@@ -19,41 +19,41 @@
 
 
 void uart_init(uint br){
-	*UART_CR=0;
+	*UART_CR = 0;
 	gpio_mode(14, GPIO_FN0);
 	gpio_mode(15, GPIO_FN0);
-    *UART_ICR=0x7FF;
+    *UART_ICR = 0x7FF;
 
     switch(br){
     case 9600:
-    	*UART_IBRD=325;
-    	*UART_FBRD=33;
+    	*UART_IBRD = 325;
+    	*UART_FBRD = 33;
     	break;
     case 19200:
-       	*UART_IBRD=162;
-    	*UART_FBRD=49;
+       	*UART_IBRD = 162;
+    	*UART_FBRD = 49;
     	break;
     case 38400:
-       	*UART_IBRD=81;
-    	*UART_FBRD=24;
+       	*UART_IBRD = 81;
+    	*UART_FBRD = 24;
     	break;
     case 57600:
-        *UART_IBRD=54;
-    	*UART_FBRD=16;
+        *UART_IBRD = 54;
+    	*UART_FBRD = 16;
     	break;
     case 115200:
-        *UART_IBRD=27;
-    	*UART_FBRD=8;
+        *UART_IBRD = 27;
+    	*UART_FBRD = 8;
     	break;
     }
-    *UART_LCRH=0x70;
-    *UART_CR=0x301;
+    *UART_LCRH = LCRH_WLEN8 | LCRH_ENFIFO;
+	*UART_CR = CR_EN | CR_RXEN | CR_TXEN;
 }
 
 void uart_write(char *buff, uint len) {
 	uint i;
 	for (i = 0; i < len; ++i) {
-		while ((*UART_FR) & (1 << 5));
+		while ((*UART_FR) & FR_TXFF);
 		*UART_DR = (uint)buff[i];
 	}
 	while (!(*UART_FR & FR_TXFE));
@@ -62,7 +62,7 @@ void uart_write(char *buff, uint len) {
 void uart_read(char *buff, uint len) {
 	uint i;
 	for (i = 0; i < len; ++i) {
-		while ((*UART_FR) & (1 << 4));
+		while ((*UART_FR) & FR_RXFE);
 		buff[i] = *UART_DR;
 	}
 }
