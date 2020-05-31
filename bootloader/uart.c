@@ -1,12 +1,12 @@
 #include "rpi.h"
 
-#define UART_DR	((volatile uint*)(UART_BASE+0x00))
-#define UART_FR	((volatile uint*)(UART_BASE+0x18))
-#define UART_IBRD	((volatile uint*)(UART_BASE+0x24))
-#define UART_FBRD	((volatile uint*)(UART_BASE+0x28))
-#define UART_LCRH	((volatile uint*)(UART_BASE+0x2C))
-#define UART_CR	((volatile uint*)(UART_BASE+0x30))
-#define UART_ICR	((volatile uint*)(UART_BASE+0x44))
+#define UART_DR		((volatile uint*)(UART_BASE + 0x00))
+#define UART_FR		((volatile uint*)(UART_BASE + 0x18))
+#define UART_IBRD	((volatile uint*)(UART_BASE + 0x24))
+#define UART_FBRD	((volatile uint*)(UART_BASE + 0x28))
+#define UART_LCRH	((volatile uint*)(UART_BASE + 0x2C))
+#define UART_CR		((volatile uint*)(UART_BASE + 0x30))
+#define UART_ICR	((volatile uint*)(UART_BASE + 0x44))
 
 #define CR_EN		(1 << 0)
 #define CR_RXEN		(1 << 7)
@@ -20,11 +20,10 @@
 
 void uart_init(uint br){
 	*UART_CR=0;
-
 	gpio_mode(14, GPIO_FN0);
 	gpio_mode(15, GPIO_FN0);
-
     *UART_ICR=0x7FF;
+
     switch(br){
     case 9600:
     	*UART_IBRD=325;
@@ -47,10 +46,8 @@ void uart_init(uint br){
     	*UART_FBRD=8;
     	break;
     }
-
     *UART_LCRH=0x70;
     *UART_CR=0x301;
-
 }
 
 void uart_write(char *buff, uint len) {

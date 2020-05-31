@@ -32,10 +32,10 @@ int atoi(char *str) {
     return res;
 }
 
-
-void run_prog(int addr) {
-	addr = addr;
-	asm volatile("bx r0");
+void run_prog(uint addr) {
+	void (*func)();
+	func = (void*)addr;
+	func();
 }
 
 
