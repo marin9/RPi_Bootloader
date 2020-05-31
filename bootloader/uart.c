@@ -1,5 +1,5 @@
-#define UART_BASE			0x20215000
-#define GPIO_BASE			0x20200000
+#include "rpi.h"
+
 #define AUX_ENABLES			((volatile unsigned int*)(UART_BASE+0x04))
 #define AUX_MU_IO_REG		((volatile unsigned int*)(UART_BASE+0x40))
 #define AUX_MU_IER_REG		((volatile unsigned int*)(UART_BASE+0x44))
@@ -54,26 +54,20 @@ void uart_init(){
 	}
 }
 
-int uart_send(void *buf, int len){
-	int i;
-	unsigned char *c=(unsigned char*)buf;
+void uart_read(char *buff, uint len){
+	uint i;
+	for(i=0;i<len;++i){
+		while(!(*AUX_MU_LSR_REG & 0x01));
+		buff[i]=(unsigned char)((*AUX_MU_IO_REG)&0xff);
+	}
+}
 
+void uart_write(char *buff, uint len){
+	uint i;
 	for(i=0;i<len;++i){
 		while(!(*AUX_MU_LSR_REG & 0x20));
-		*AUX_MU_IO_REG=c[i];
+		*AUX_MU_IO_REG=buff[i];
 	}
 	// flush
 	while(!(*AUX_MU_LSR_REG & 0x40));
-	return i;
-}
-
-int uart_recv(void *buf, int len){
-	int i;
-	unsigned char *c=(unsigned char*)buf;
-
-	for(i=0;i<len;++i){
-		while(!(*AUX_MU_LSR_REG & 0x01));
-		c[i]=(unsigned char)((*AUX_MU_IO_REG)&0xff);
-	}
-	return i;
 }
