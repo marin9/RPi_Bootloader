@@ -6,17 +6,16 @@
 #include <fcntl.h>
 #include <errno.h>
 
-
 static int serial;
 
-
-void serial_open(char *path){
+void serial_open(char *path) {
 	// O_RDWR - Read/Write access to serial port
 	// O_NOCTTY - No terminal will control the process
 	// O_NDELAY - Non Blocking Mode,Does not care about the
 	// status of DCD line, open() returns immediatly
-	if((serial=open(path, O_RDWR|O_NOCTTY|O_NDELAY))<0){
-		printf("ERROR: serial open fail: %s\n%s\n", strerror(errno), path);
+
+	if ((serial = open(path, O_RDWR | O_NOCTTY | O_NDELAY)) < 0) {
+		printf(" ERROR: serial open fail: %s\n%s\n", strerror(errno), path);
 		exit(10);
 	}
 
@@ -24,43 +23,47 @@ void serial_open(char *path){
 	struct termios st;
 	fcntl(serial, F_SETFL, FNDELAY);
 	bzero(&st, sizeof(st));
-	st.c_cflag=B115200|CS8|CLOCAL|CREAD;
-	st.c_iflag=IGNPAR;
+	st.c_cflag = B115200 | CS8 | CLOCAL | CREAD;
+	st.c_iflag = IGNPAR;
 	tcflush(serial, TCIFLUSH);
-	
-	if((tcsetattr(serial, TCSANOW, &st))!=0){
-		printf("ERROR: serial open fail: tcsetattr: %s\n", strerror(errno));
+
+	if ((tcsetattr(serial, TCSANOW, &st)) != 0) {
+		printf(" ERROR: serial open fail: tcsetattr: %s\n", strerror(errno));
 		exit(11);
 	}
 }
 
-void serial_close(){
+void serial_close() {
 	close(serial);
 }
 
-void serial_send(char *buff, int len){
-	int r, i=0;
-	while(i<len){
-		r=write(serial, buff+i, len-i);
-		if(r<0 && errno!=11){
-			printf("ERROR: serial write fail: %s\n", strerror(errno));
+void serial_send(char *buff, uint len) {
+	int r;
+	uint i = 0;
+
+	while (i < len) {
+		r = write(serial, buff + i, len - i);
+		if ((r < 0) && (errno != 11)) {
+			printf(" ERROR: serial write fail: %s\n", strerror(errno));
 			exit(12);
-		}else if(r<0 && errno==11){
+		} else if ((r < 0) && (errno == 11)) {
 			continue;
 		}
-		i+=r;
+		i += r;
 	}
 	tcdrain(serial);
 }
 
-void serial_recv(char *buff, int len){
-	int r, i=0;
-	while(i<len){
-		r=read(serial, buff+i, len-i);
-		if(r<0){
-			printf("ERROR: serial read fail: %s\n", strerror(errno));
+void serial_recv(char *buff, uint len) {
+	int r;
+	uint i = 0;
+
+	while (i < len) {
+		r = read(serial, buff + i, len - i);
+		if (r < 0) {
+			printf(" ERROR: serial read fail: %s\n", strerror(errno));
 			exit(13);
 		}
-		i+=r;
+		i += r;
 	}
 }

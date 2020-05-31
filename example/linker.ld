@@ -1,9 +1,6 @@
-ENTRY(_start)
-
+ENTRY(start)
 SECTIONS{
 	. = 0x10000;
-	
-	__start = .;
 
 	.text : {
 		start.o(.text*);
@@ -18,7 +15,4 @@ SECTIONS{
 	.bss : {
 		*(.bss*);
 	}
-
-	__end = .;
 }
-

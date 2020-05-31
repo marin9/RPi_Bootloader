@@ -1,9 +1,7 @@
 #pragma once
 
-#define INPUT	0
-#define OUTPUT	1
-#define LOW 	0
-#define HIGH 	1
+#define GPIO_IN	    0
+#define GPIO_OUT	1
 
 void gpio_open(int pin, int mode);
 void gpio_write(int pin, int stat);
