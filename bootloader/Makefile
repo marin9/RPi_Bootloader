@@ -1,27 +1,28 @@
-CC=arm-none-eabi
-MCPU=-mcpu=arm1176jzf-s
-CFLAGS=-ffreestanding -nostdlib -Wall -Wextra -c
-LDFLAGS=-nostdlib -lgcc
+CC	= arm-none-eabi
+MCPU	= -mcpu=arm1176jzf-s
+CFLAGS	= -nostdlib -ffreestanding -Wall -Wextra
+LDFLAGS	= -nostdlib -lgcc
 
-TARGET=kernel.img
-ELF=kernel.elf
-LINKER=linker.ld
+LINKER	= linker.ld
+ELF	= kernel.elf
+TARGET	= kernel.img
 
+INC	:= $(wildcard *.h)
+SRC := $(wildcard *.c)
+OBJ	:= $(SRC:%.c=%.o)
 
-$(TARGET): start.c main.c gpio.c uart.c rpi.h
-	@echo " Compile\tstart.o"
-	@$(CC)-gcc $(MCPU) $(CFLAGS) start.c -o start.o
-	@echo " Compile\tmain.o"
-	@$(CC)-gcc $(MCPU) $(CFLAGS) main.c -o main.o
-	@echo " Compile\tuart.o"
-	@$(CC)-gcc $(MCPU) $(CFLAGS) uart.c -o uart.o
-	@echo " Compile\tgpio.o"
-	@$(CC)-gcc $(MCPU) $(CFLAGS) gpio.c -o gpio.o
-	@echo " Compile\t$(ELF)"
-	@$(CC)-gcc -T $(LINKER) start.o main.o uart.o gpio.o -o $(ELF) $(LDFLAGS)
-	@echo " Create\t\t$(TARGET)"
+$(TARGET): $(ELF)
+	@echo " Create\t\t" $(TARGET)
 	@$(CC)-objcopy $(ELF) -O binary $(TARGET)
 
+$(ELF): $(LINKER) $(OBJ)
+	@echo " Linking\t" $(ELF)
+	@$(CC)-gcc -T $(LINKER) $(OBJ) -o $@ $(LDFLAGS)
+
+$(OBJ): %.o : %.c $(INC)
+	@echo " Compile\t" $<
+	@$(CC)-gcc $(MCPU) $(CFLAGS) -c $< -o $@
+
 clean:
-	@echo " Clean"
-	@rm -f $(TARGET) $(ELF) *.o
+	@echo "Clean"
+	@-rm -rf *.o $(ELF) $(TARGET)
