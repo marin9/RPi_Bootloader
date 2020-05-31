@@ -12,9 +12,20 @@
 #define GPCLR1      ((volatile uint*)(GPIO_BASE + 0x2C))
 #define GPLEV0      ((volatile uint*)(GPIO_BASE + 0x34))
 #define GPLEV1      ((volatile uint*)(GPIO_BASE + 0x38))
+#define GPEDS0      ((volatile uint*)(GPIO_BASE + 0x40))
+#define GPEDS1      ((volatile uint*)(GPIO_BASE + 0x44))
+#define GPREN0      ((volatile uint*)(GPIO_BASE + 0x4C))
+#define GPREN1      ((volatile uint*)(GPIO_BASE + 0x50))
+#define GPFEN0      ((volatile uint*)(GPIO_BASE + 0x58))
+#define GPFEN1      ((volatile uint*)(GPIO_BASE + 0x5C))
+#define GPHEN0      ((volatile uint*)(GPIO_BASE + 0x64))
+#define GPHEN1      ((volatile uint*)(GPIO_BASE + 0x68))
+#define GPLEN0      ((volatile uint*)(GPIO_BASE + 0x70))
+#define GPLEN1      ((volatile uint*)(GPIO_BASE + 0x74))
 #define GPPUD       ((volatile uint*)(GPIO_BASE + 0x94))
 #define GPPUDCLK0   ((volatile uint*)(GPIO_BASE + 0x98))
 #define GPPUDCLK1   ((volatile uint*)(GPIO_BASE + 0x9C))
+#define NUM_GPIO    60
 
 
 static void delay(uint n) {
@@ -22,8 +33,10 @@ static void delay(uint n) {
         asm volatile("nop");
 }
 
-void gpio_mode(uint pin, uint mode) {
-    uint pull;
+
+void gpio_mode(uint pin, int mode) {
+    int pull;
+
     pull = (mode & 0xf0) >> 4;
     mode = mode & 0x0f;
 
@@ -42,26 +55,30 @@ void gpio_mode(uint pin, uint mode) {
     else if (pin < 60) *GPFSEL5 |= mode << ((pin - 50) * 3);
 
     *GPPUD = pull;
+
     delay(200);
+
     if (pin >= 32)
         *GPPUDCLK1 = 1 << (pin - 32);
     else
         *GPPUDCLK0 = 1 << pin;
+
     delay(200);
+
     if (pin >= 32)
         *GPPUDCLK1 = 0;
     else
         *GPPUDCLK0 = 0;
 }
 
-void gpio_write(uint pin, uint value) {
+void gpio_write(uint pin, int val) {
     if (pin >= 32) {
-        if (value)
+        if (val)
             *GPSET1 =1 << (pin - 32);
         else
             *GPCLR1 =1 << (pin - 32);
     } else {
-        if (value)
+        if (val)
             *GPSET0 = 1 << pin;
         else
             *GPCLR0 = 1 << pin;

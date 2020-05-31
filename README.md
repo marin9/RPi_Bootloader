@@ -15,6 +15,6 @@ make
 4) restart RPi
 5) boot program:
 ```c
-sudo ./rpiprog -s /dev/ttyUSB0 -i example/kernel.img
+sudo ./rpiprog -s /dev/ttyUSB0 -i blink.img
 ```
 For next boot you need to repeat only steps 4 and 5.

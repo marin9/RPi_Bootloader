@@ -1,5 +1,5 @@
-ENTRY(_start)
-SECTIONS{
+ENTRY(start)
+SECTIONS {
 	. = 0x8000;
 
 	.text : {
@@ -7,7 +7,7 @@ SECTIONS{
 		*(.text*);
 	}
 
-	.rodate : {
+	.rodata : {
 		*(.rodata*);
 	}
 

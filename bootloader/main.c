@@ -32,17 +32,18 @@ int atoi(char *str) {
     return res;
 }
 
+
 void run_prog(int addr) {
 	addr = addr;
 	asm volatile("bx r0");
 }
 
 
-void main() {
+void setup() {
 	int size;
 	char req[PACK_LEN];
 
-	uart_init();
+	uart_init(115200);
 	gpio_mode(READY_LED, GPIO_OUT);
 	gpio_mode(BUSY_LED, GPIO_OUT);
 	gpio_mode(ACT_LED, GPIO_OUT);
