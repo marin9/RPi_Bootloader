@@ -70,7 +70,6 @@ void setup() {
 			uart_write(req, PACK_LEN);
 
 			uart_read((char*)PROG_ADDR, size);
-
 			strcpy(req, "Data received.");
 			uart_write(req, PACK_LEN);
 

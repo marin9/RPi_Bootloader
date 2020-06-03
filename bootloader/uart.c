@@ -18,7 +18,7 @@
 #define LCRH_WLEN8	(3 << 5)
 
 
-void uart_init(uint br){
+void uart_init(uint br) {
 	*UART_CR = 0;
 	gpio_mode(14, GPIO_FN0);
 	gpio_mode(15, GPIO_FN0);

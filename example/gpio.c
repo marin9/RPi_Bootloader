@@ -6,7 +6,6 @@
 #define GPFSEL3     ((volatile unsigned int*)(GPIO_BASE + 0x0C))
 #define GPFSEL4     ((volatile unsigned int*)(GPIO_BASE + 0x10))
 #define GPFSEL5     ((volatile unsigned int*)(GPIO_BASE + 0x14))
-
 #define GPSET0      ((volatile unsigned int*)(GPIO_BASE + 0x1C))
 #define GPSET1      ((volatile unsigned int*)(GPIO_BASE + 0x20))
 #define GPCLR0      ((volatile unsigned int*)(GPIO_BASE + 0x28))

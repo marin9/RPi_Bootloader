@@ -97,6 +97,7 @@ int main(int argc, char **argv) {
 			cmd = CMD_TEST;
 			break;
 		case 'h':
+			printf("Raspberry Pi Bootloader v1.4\n");
 			printf("Usage:\n");
 			printf(" -t        : run test\n");
 			printf(" -h        : print help\n");
