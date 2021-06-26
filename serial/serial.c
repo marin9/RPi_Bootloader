@@ -8,6 +8,7 @@
 
 static int serial;
 
+
 void serial_open(char *path) {
 	// O_RDWR - Read/Write access to serial port
 	// O_NOCTTY - No terminal will control the process
@@ -38,32 +39,34 @@ void serial_close() {
 }
 
 void serial_send(char *buff, uint len) {
-	int r;
+	int ret;
 	uint i = 0;
 
 	while (i < len) {
-		r = write(serial, buff + i, len - i);
-		if ((r < 0) && (errno != 11)) {
-			printf(" ERROR: serial write fail: %s\n", strerror(errno));
-			exit(12);
-		} else if ((r < 0) && (errno == 11)) {
-			continue;
+		ret = write(serial, buff + i, len - i);
+		if (ret < 0) {
+			if (errno == EAGAIN) {
+				continue;
+			} else {
+				printf(" ERROR: serial write fail: %s\n", strerror(errno));
+				exit(12);
+			}
 		}
-		i += r;
+		i = i + ret;
 	}
 	tcdrain(serial);
 }
 
 void serial_recv(char *buff, uint len) {
-	int r;
+	int ret;
 	uint i = 0;
 
 	while (i < len) {
-		r = read(serial, buff + i, len - i);
-		if (r < 0) {
+		ret = read(serial, buff + i, len - i);
+		if (ret < 0) {
 			printf(" ERROR: serial read fail: %s\n", strerror(errno));
 			exit(13);
 		}
-		i += r;
+		i = i + ret;
 	}
 }

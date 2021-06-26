@@ -2,13 +2,14 @@ ENTRY(start)
 SECTIONS {
 	. = 0x8000;
 
-	.text : {
-		start.o(.text*);
-		*(.text*);
+	.init : {
+		*(.init*);
 	}
 
-	.rodata : {
-		*(.rodata*);
+	. = 0x40000;
+
+	.text : {
+		*(.text*);
 	}
 
 	.data : {
@@ -18,4 +19,7 @@ SECTIONS {
 	.bss : {
 		*(.bss*);
 	}
+
+	. = . + 0x1000;
+	stack = .;
 }

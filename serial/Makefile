@@ -1,10 +1,10 @@
-CC=gcc
-CFLAGS=-Wall -Wextra
-TARGET=../rpiprog
+CC		= gcc
+CFLAGS	= -Wall -Wextra
+TARGET	= ../rpiprog
 
-SRC=$(wildcard *.c)
-INC=$(wildcard *.h)
-OBJ=$(SRC:.c=.o)
+SRC		= $(wildcard *.c)
+INC		= $(wildcard *.h)
+OBJ		= $(SRC:.c=.o)
 
 $(TARGET): $(OBJ)
 	@echo " Create\t\t" $@

@@ -1,28 +1,30 @@
-CC=arm-none-eabi
-MCPU=-mcpu=arm1176jzf-s
-CFLAGS=-nostdlib -ffreestanding -Wall -Wextra -O2
-LDFLAGS=-nostdlib -lgcc
+CC			= arm-none-eabi
+MCPU		= -mcpu=arm1176jzf-s
+CFLAGS		= -ffreestanding -Wall -Wextra -O2 -I.
+LDFLAGS		= -nostdlib
+LINKER		= linker.ld
+TARGET		= ../blink
 
-LINKER=linker.ld
-ELF=kernel.elf
-TARGET=../blink.img
+INC			:= $(wildcard *.h)
+ASM 		:= $(wildcard *.s)
+SRC 		:= $(wildcard *.c)
+OBJA		:= $(ASM:%.s=%.o)
+OBJC		:= $(SRC:%.c=%.o)
 
-INC	:= $(wildcard *.h)
-SRC := $(wildcard *.c)
-OBJ := $(SRC:%.c=%.o)
 
-$(TARGET): $(ELF)
-	@echo " Create\t\t" $(TARGET)
-	@$(CC)-objcopy $(ELF) -O binary $(TARGET)
+$(TARGET): $(LINKER) $(OBJA) $(OBJC)
+	@echo " Create\t\t" $(TARGET).img
+	@$(CC)-gcc -T $(LINKER) $(OBJA) $(OBJC) -o $(TARGET).elf $(LDFLAGS)
+	@$(CC)-objcopy $(TARGET).elf -O binary $(TARGET).img
 
-$(ELF): $(LINKER) $(OBJ)
-	@echo " Linking\t" $(ELF)
-	@$(CC)-gcc -T $(LINKER) $(OBJ) -o $@ $(LDFLAGS)
+$(OBJA): %.o : %.s $(INC)
+	@echo " Compile\t" $<
+	@$(CC)-gcc $(MCPU) $(CFLAGS) -c $< -o $@
 
-$(OBJ): %.o : %.c $(INC)
+$(OBJC): %.o : %.c $(INC)
 	@echo " Compile\t" $<
 	@$(CC)-gcc $(MCPU) $(CFLAGS) -c $< -o $@
 
 clean:
-	@echo "Clean"
-	@-rm -rf *.o $(ELF) $(TARGET)
+	@echo " Clean"
+	@-rm -rf *.o $(TARGET).*

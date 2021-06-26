@@ -2,8 +2,7 @@
 
 Run program on Raspberry Pi over UART, instead of removing, writing,
 and replacing the SD card numerous times. Bootloader will write program
-into RAM at address 0x10000, so you need to set this address into linker
-script instead of 0x8000.
+into RAM at address 0x8000.
 
 **Usage:**
 1) Compile:

@@ -1,24 +1,21 @@
-#include "rpi.h"
+#include <rpi.h>
 
-#define READY_LED	21
-#define BUSY_LED	26
-#define ACT_LED		47
+#define LED			47
 
 #define PACK_LEN 	32
-#define PROG_ADDR	0x10000
+#define PROG_ADDR	0x8000
 
 #define CMD_TEST	0
-#define CMD_EXE		1
+#define CMD_LOAD	1
 
 
-char *strcpy(char *dest, char *src) {
+void strcpy(char *dest, char *src) {
 	int i = 0;
 	while (src[i]) {
 		dest[i] = src[i];
 		++i;
 	}
 	dest[i] = 0;
-	return dest;
 }
 
 int atoi(char *str) {
@@ -39,49 +36,42 @@ void run_prog(uint addr) {
 }
 
 
-void setup() {
+void main() {
 	int size;
 	char req[PACK_LEN];
 
-	uart_init(115200);
-	gpio_mode(READY_LED, GPIO_OUT);
-	gpio_mode(BUSY_LED, GPIO_OUT);
-	gpio_mode(ACT_LED, GPIO_OUT);
+	uart_init();
+	gpio_init(LED, GPIO_OUT);
 
 	while (1) {
-		gpio_write(READY_LED, 1);
-		gpio_write(BUSY_LED, 0);
-		gpio_write(ACT_LED, 0);
-
+		gpio_write(LED, 0);
 		uart_read(req, PACK_LEN);
-		gpio_write(READY_LED, 0);
-		gpio_write(BUSY_LED, 1);
-		gpio_write(ACT_LED, 1);
+
+		gpio_write(LED, 1);
 
 		switch (req[0]) {
 		case CMD_TEST:
-			strcpy(req, "Ready");
+			strcpy(req, "Bootloader v2.0 OK");
 			uart_write(req, PACK_LEN);
+			uart_flush();
 			break;
 
-		case CMD_EXE:
+		case CMD_LOAD:
 			size = atoi(req + 1);
-			strcpy(req, "Ready");
-			uart_write(req, PACK_LEN);
-
 			uart_read((char*)PROG_ADDR, size);
-			strcpy(req, "Data received.");
-			uart_write(req, PACK_LEN);
 
-			gpio_write(READY_LED, 0);
-			gpio_write(BUSY_LED, 0);
-			gpio_write(ACT_LED, 0);
+			strcpy(req, "Done.");
+			uart_write(req, PACK_LEN);
+			uart_flush();
+
+			gpio_write(LED, 0);
 			run_prog(PROG_ADDR);
 			break;
 
 		default:
 			strcpy(req, "Unsupported operation.");
 			uart_write(req, PACK_LEN);
+			uart_flush();
 			break;
 		}
 	}

@@ -12,16 +12,14 @@
 #define GPIO_FN3		7
 #define GPIO_FN4		3
 #define GPIO_FN5		2
-#define GPIO_PULLOFF	(0 << 4)
-#define GPIO_PULLDOWN	(1 << 4)
-#define GPIO_PULLUP	    (2 << 4)
 
 typedef unsigned int uint;
 
-void uart_init(uint br);
+void uart_init();
 void uart_read(char *buff, uint len);
 void uart_write(char *buff, uint len);
+void uart_flush();
 
-void gpio_mode(uint pin, uint mode);
+void gpio_init(uint pin, uint mode);
 void gpio_write(uint pin, uint val);
 uint gpio_read(uint pin);

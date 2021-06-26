@@ -14,7 +14,7 @@
 #define GPLEV1      ((volatile unsigned int*)(GPIO_BASE + 0x38))
 
 
-void gpio_open(int pin, int mode) {
+void gpio_init(int pin, int mode) {
     if (pin < 10)      *GPFSEL0 &= ~(7 << ((pin - 0) * 3));
     else if (pin < 20) *GPFSEL1 &= ~(7 << ((pin - 10) * 3));
     else if (pin < 30) *GPFSEL2 &= ~(7 << ((pin - 20) * 3));

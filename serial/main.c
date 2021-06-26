@@ -6,8 +6,9 @@
 #include "serial.h"
 
 #define CMD_TEST	0
-#define CMD_EXE		1
+#define CMD_LOAD	1
 #define PACK_LEN	32
+
 
 char *serial_default = "/dev/ttyUSB0";
 char *exe_default = "kernel.img";
@@ -19,11 +20,13 @@ void run_test(char *serial_path) {
 	serial_open(serial_path);
 	memset(buff, 0, PACK_LEN);
 
-	printf(" Start TEST...\n");
+	printf(" Send request: ");
 	serial_send(buff, PACK_LEN);
+	printf("OK\n");
 
+	printf(" Received response: ");
 	serial_recv(buff, PACK_LEN);
-	printf(" RPi: %s\n", buff);
+	printf("%s\n", buff);
 	serial_close();
 }
 
@@ -47,18 +50,14 @@ void boot_prog(char *serial_path, char *exe_path) {
 	fseek(fd, 0L, SEEK_SET);
 
 	// send request
-	printf(" Send request: %d B\n", size);
-	msg[0] = CMD_EXE;
+	printf(" Send request: ");
+	msg[0] = CMD_LOAD;
 	sprintf(msg + 1, "%d", size);
 	serial_send(msg, PACK_LEN);
-
-	// recv ack
-	memset(msg, 0, PACK_LEN);
-	serial_recv(msg, PACK_LEN);
-	printf(" RPi: %s\n", msg);
+	printf("%d B\n", size);
 
 	// send data
-	printf(" Sending data...\n");
+	printf(" Send data: ");
 	while (size) {
 		n = fread(msg, 1, PACK_LEN, fd);
 		if (!n) {
@@ -68,20 +67,21 @@ void boot_prog(char *serial_path, char *exe_path) {
 		serial_send(msg, n);
 		size -= n;
 	}
-	printf(" Sending complete.\n");
+	printf(" OK\n");
 	fclose(fd);
 
 	// recv ack
+	printf(" Receive response: ");
 	memset(msg, 0, PACK_LEN);
 	serial_recv(msg, PACK_LEN);
-	printf(" RPi: %s\n", msg);
+	printf(" %s\n", msg);
 	serial_close();
 }
 
 
 int main(int argc, char **argv) {
 	int c;
-	int cmd = CMD_EXE;
+	int cmd = CMD_LOAD;
 	char *exe_path = exe_default;
 	char *serial_path = serial_default;
 
@@ -105,7 +105,7 @@ int main(int argc, char **argv) {
 			printf(" -i [path] : set executable path\n");
 			exit(0);
 		default:
-			printf(" Illegal options.\n");
+			printf(" Illegal options. Type -h for help\n");
 			exit(1);
 		}
 	}
